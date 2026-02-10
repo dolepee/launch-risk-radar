@@ -8,7 +8,7 @@ from rich.console import Console
 from .analyzer import quick_heuristic_assess
 from .base_rpc import BaseRPC
 from .config import load_config
-from .publishers import format_alert, send_telegram
+from .publishers import format_alert, send_telegram, send_whatsapp
 from .store import Store
 
 console = Console()
@@ -51,12 +51,11 @@ async def run_loop() -> None:
 
                     # publish
                     console.print(msg)
-                    if (
-                        cfg.telegram_bot_token
-                        and cfg.telegram_chat_id
-                        and risk.score >= cfg.alert_min_score
-                    ):
-                        await send_telegram(cfg.telegram_bot_token, cfg.telegram_chat_id, msg)
+                    if risk.score >= cfg.alert_min_score:
+                        if cfg.telegram_bot_token and cfg.telegram_chat_id:
+                            await send_telegram(cfg.telegram_bot_token, cfg.telegram_chat_id, msg)
+                        if cfg.whatsapp_target:
+                            await send_whatsapp(cfg.whatsapp_target, msg)
 
                 store.set_last_block(bn)
             last = latest

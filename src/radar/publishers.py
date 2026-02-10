@@ -24,3 +24,29 @@ async def send_telegram(bot_token: str, chat_id: str, text: str) -> None:
     async with httpx.AsyncClient(timeout=20) as client:
         r = await client.post(url, json={"chat_id": chat_id, "text": text})
         r.raise_for_status()
+
+
+async def send_whatsapp(target: str, text: str) -> None:
+    """Send a WhatsApp DM via the local OpenClaw gateway.
+
+    This uses the OpenClaw CLI, which routes through the configured WhatsApp channel.
+    """
+
+    import asyncio
+
+    proc = await asyncio.create_subprocess_exec(
+        "/home/ubuntu/.npm-global/bin/openclaw",
+        "message",
+        "send",
+        "--channel",
+        "whatsapp",
+        "--target",
+        target,
+        "--message",
+        text,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    _out, err = await proc.communicate()
+    if proc.returncode != 0:
+        raise RuntimeError(f"openclaw message send failed: {err.decode('utf-8', 'ignore')}")

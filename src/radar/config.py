@@ -16,6 +16,8 @@ class Config:
     telegram_bot_token: str | None
     telegram_chat_id: str | None
 
+    whatsapp_target: str | None
+
 
 def load_config() -> Config:
     load_dotenv(override=False)
@@ -27,4 +29,5 @@ def load_config() -> Config:
         alert_min_score=int(os.environ.get("ALERT_MIN_SCORE", "6")),
         telegram_bot_token=os.environ.get("TELEGRAM_BOT_TOKEN"),
         telegram_chat_id=os.environ.get("TELEGRAM_CHAT_ID"),
+        whatsapp_target=os.environ.get("WHATSAPP_TARGET"),
     )
